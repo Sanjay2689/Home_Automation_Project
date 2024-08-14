@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Automation</title>
+    <link rel="icon" href="home-logo.png" type="image/x-icon">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            border: none;
+            text-align: center;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            background-image: url('IMG-20240812-WA0002.jpg');
+            background-size: cover;
+        }
+
+        header {
+            color: white;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            color: black;
+        }
+
+        header h1 {
+            margin: 15px;
+            flex-grow: 1;
+            text-align: left;
+            font-size: 20px;
+        }
+
+        header img {
+            height: 40px;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .label {
+            margin: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .button-container {
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        #door-controls button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #fan-controls button {
+            background-color: red;
+            color: white;
+        }
+
+        #fan-controls button.on {
+            background-color: green;
+        }
+
+        #fan-speed-controls {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        #fan-speed-controls button {
+            background-color: #007bff;
+            color: white;
+            width: 18%;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #light-controls button {
+            background-color: red;
+            color: white;
+        }
+
+        #light-controls button.on {
+            background-color: green;
+        }
+
+        #fan-speed-controls button.active {
+            background-color: #17416d;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img src="home-logo.png" alt="Logo">
+        <h1>Home Automation</h1>
+    </header>
+
+    <div class="container">
+        <!-- Door Controls -->
+        <div class="label">DOOR CONTROLS</div>
+        <div id="door-controls" class="button-container">
+            <button onclick="sendCommand('open')">OPEN DOOR</button>
+            <button onclick="sendCommand('close')">CLOSE DOOR</button>
+        </div>
+
+        <!-- Fan Controls -->
+        <div class="label">FAN CONTROLS</div>
+        <div id="fan-controls" class="button-container">
+            <button id="fan-button" onclick="toggleFan()">&#x23FB; Power</button>
+        </div>
+        <div id="fan-speed-controls">
+            <button onclick="setFanSpeed(0)">0</button>
+            <button onclick="setFanSpeed(1)">1</button>
+            <button onclick="setFanSpeed(2)">2</button>
+            <button onclick="setFanSpeed(3)">3</button>
+            <button onclick="setFanSpeed(4)">4</button>
+        </div>
+
+        <!-- Light Controls -->
+        <div class="label">LIGHT CONTROLS</div>
+        <div id="light-controls" class="button-container">
+            <button id="light-button" onclick="toggleLight()">&#x23FB; Light</button>
+        </div>
+    </div>
+
+    <script>
+        function sendCommand(command) {
+            fetch(`http://192.168.4.1/${command}`)
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function toggleFan() {
+            const fanButton = document.getElementById('fan-button');
+            if (fanButton.classList.contains('on')) {
+                fanButton.classList.remove('on');
+                fanButton.style.backgroundColor = 'red';
+                sendCommand('fan_off');
+            } else {
+                fanButton.classList.add('on');
+                fanButton.style.backgroundColor = 'green';
+                sendCommand('fan_on');
+            }
+        }
+
+        function setFanSpeed(speed) {
+            if (speed == 0) {
+                sendCommand('fan_off');
+            }
+            else {
+                sendCommand(`fan_speed_${speed}`);
+            }
+            const buttons = document.querySelectorAll('#fan-speed-controls button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            buttons[speed].classList.add('active');
+        }
+
+        function toggleLight() {
+            const lightButton = document.getElementById('light-button');
+            if (lightButton.classList.contains('on')) {
+                lightButton.classList.remove('on');
+                lightButton.style.backgroundColor = 'red';
+                sendCommand('light_off');
+            } else {
+                lightButton.classList.add('on');
+                lightButton.style.backgroundColor = 'green';
+                sendCommand('light_on');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
